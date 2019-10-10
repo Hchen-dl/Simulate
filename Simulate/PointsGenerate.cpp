@@ -101,8 +101,14 @@ std::vector<cv::Point> GeneratePoints(std::vector<cv::Point> nPoints,int step, i
 	std::vector<cv::Point> windowPoints;
 	do {
 		windowPoints = GetSubPoints(nzPoints, sizeWindow, wheelCenter);
-
+		if(windowPoints.size()>2)
 		lineParam = LineFitRANSAC(windowPoints);
+		else
+		{
+			//未找到作物行
+			wheelCenter[3] += step;
+			continue;
+		}
 		//if line Param is valid
 		cos_t = lineParam.params[0];
 		sin_t = lineParam.params[1];
@@ -122,8 +128,12 @@ std::vector<cv::Point> GeneratePoints(std::vector<cv::Point> nPoints,int step, i
 		wheelCenter = cv::Vec4f(cos_t, sin_t, x, y);
 		newPoints.push_back(cv::Point(wheelCenter[2], wheelCenter[3]));//
 	} 
-	while (windowPoints.size()>15);//变量
+	while (wheelCenter[3]+sizeWindow.height<nzPoints.back().y);//变量
 	//initialDistance += 0.5;
+	
+	//补充
+	std::vector<cv::Point> endPoints=GenerateRandomPoints((nzPoints.size()-newPoints.size()),wheelCenter,step,5);
+	newPoints.insert(newPoints.end(), endPoints.begin(), endPoints.end());
 	return newPoints;
 }
 
@@ -188,14 +198,16 @@ void DrawPoins(std::vector<cv::Point> nzPoints, cv::Mat showImage)
 {
 	if (showImage.rows == 0)
 		showImage = cv::Mat::ones(cv::Size(1800, nzPoints.size()*2),0);
-
+	int sum = 0;
 	for (int i = 0; i < nzPoints.size(); i++)
 	{
 		cv::circle(showImage, nzPoints[i], 1, cv::Scalar(255), 3);
+		sum += nzPoints[i].x;
 		//std::cout << "x: " << nzPoints[i].x << "  ";
 		//std::cout << "y: " << nzPoints[i].y<< std::endl;
 	}
-
+	double mean = sum / (double)nzPoints.size();
+	std::cout << "x: " << mean<< "  ";
 	SLine lineParam=LineFitRANSAC(nzPoints,5,0.99,0.01,10
 	);
 	
@@ -229,7 +241,7 @@ void DrawPoins(std::vector<cv::Point> nzPoints, cv::Mat showImage)
 	cv::namedWindow("ShowPoints", cv::WINDOW_FREERATIO);
 	cv::imshow("ShowPoints", showImage);
 	std::cout << "显示点图像，在图像窗口按键继续……" << std::endl;
-	cv::waitKey(0);
+	cv::waitKey(10);
 }
 
 /*

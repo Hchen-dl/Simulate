@@ -33,7 +33,7 @@ struct SLine
 SLine LineFitRANSAC(
 	std::vector<cv::Point>& nzPoints,
 	float t = 5,
-	float p=0.9,
+	float p=0.99,
 	float e=0.1,
 	int T=10
 );

@@ -22,11 +22,13 @@
     <ClInclude Include="NavigationParams.h" />
     <ClInclude Include="PointsGenerate.h" />
     <ClInclude Include="Ransac_WG_CH.h" />
+    <ClInclude Include="SavePoints.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="NavigationParams.cpp" />
     <ClCompile Include="PointsGenerate.cpp" />
     <ClCompile Include="Ransac_WG_CH.cpp" />
+    <ClCompile Include="SavePoints.cpp" />
     <ClCompile Include="SimulateNavigation.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
